@@ -78,6 +78,9 @@ target/
 # exclude data from source control by default
 /data/
 
+# exclude virtual environment
+/.alosteric_venv/
+
 # Mac OS-specific storage files
 .DS_Store
 
