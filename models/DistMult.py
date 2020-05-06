@@ -8,7 +8,9 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 
 class DistMult(torch.nn.Module):
-    def __init__(self, embedding_dim=100, dropout=0.9, num_entities=2, num_relations=3):
+    def __init__(
+        self, embedding_dim=100, dropout=0.05, num_entities=2, num_relations=3
+    ):
         super(DistMult, self).__init__()
         self.emb_e = torch.nn.Embedding(num_entities, embedding_dim, padding_idx=0)
         self.emb_rel = torch.nn.Embedding(num_relations, embedding_dim, padding_idx=0)
@@ -32,11 +34,23 @@ class DistMult(torch.nn.Module):
         e1_embedded = self.inp_drop(e1_embedded)
         rel_embedded = self.inp_drop(rel_embedded)
 
-        print(e1_embedded * rel_embedded)
-        print(self.emb_e.weight.transpose(1, 0))
+        # print(e1_embedded * rel_embedded)
+        # print(self.emb_e.weight.transpose(1, 0))
 
         pred = torch.mm(e1_embedded * rel_embedded, self.emb_e.weight.transpose(1, 0))
+        # output should have a high dot product with the corrrect tail.
+        # it's the matrix multiplication of all possible tails
+        # dot product with every embedding. So you get a score for all entities.
+
         # print(pred)
-        pred = torch.sigmoid(pred)
+        # pred = torch.sigmoid(pred)
+        # the sigmoid is tecnically unecessary when not using BCE
 
         return pred
+
+
+# when using cross entropy you use a batch of tripples.
+# run it over cross entropy giving it the correct tail.
+# if you're using cross entropy, sigmoid in the dist mult is unecessary
+
+# BCE lets you formulate a loss based on 0-1 embeddings
