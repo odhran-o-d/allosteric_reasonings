@@ -40,7 +40,7 @@ class ConvE(torch.nn.Module):
         self.inp_drop = torch.nn.Dropout(args.input_drop)
         self.hidden_drop = torch.nn.Dropout(args.hidden_drop)
         self.feature_map_drop = torch.nn.Dropout2d(args.feat_drop)
-        self.loss = torch.nn.CrossEntropyLoss()
+        self.loss = torch.nn.BCELoss()
         self.emb_dim1 = args.embedding_shape1
         self.emb_dim2 = args.embedding_dim // self.emb_dim1
 
