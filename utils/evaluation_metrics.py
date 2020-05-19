@@ -1,9 +1,9 @@
 import numpy as np
 import torch
+from sklearn import metrics
 
 
 def MRR(predictions, targets):
-
     top_k_objects = torch.topk(predictions, len(predictions[0]))
     placements = (top_k_objects[1] == targets).nonzero()
     ranks = placements[:, 1] + 1
@@ -15,7 +15,6 @@ def MRR(predictions, targets):
 
 
 def SRR(predictions, targets):
-
     top_k_objects = torch.topk(predictions, len(predictions[0]))
     placements = (top_k_objects[1] == targets).nonzero()
     ranks = placements[:, 1] + 1
@@ -26,9 +25,16 @@ def SRR(predictions, targets):
     return sum_recporical_rank
 
 
-def ROC(x):
-    return x
+def auprc_auroc_ap(target_tensor, score_tensor):
+    target_tensor = torch.flatten(target_tensor)
+    score_tensor = torch.flatten(score_tensor)
 
+    y = target_tensor.detach().cpu().numpy()
+    pred = score_tensor.detach().cpu().numpy()
 
-# this does not currently include masking!!!!
-# However I don't think I need it because of my formulation right now?
+    auroc = metrics.roc_auc_score(y, pred)
+    ap = metrics.average_precision_score(y, pred)
+    y, xx, _ = metrics.precision_recall_curve(y, pred)
+    auprc = metrics.auc(xx, y)
+
+    return auprc, auroc, ap
