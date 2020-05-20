@@ -9,7 +9,7 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 class Complex(torch.nn.Module):
     def __init__(
-        self, embedding_dim=100, dropout=0.05, num_entities=2, num_relations=4
+        self, args, embedding_dim=100, dropout=0.05, num_entities=2, num_relations=4
     ):
         super(Complex, self).__init__()
         self.num_entities = num_entities

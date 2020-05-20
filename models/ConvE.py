@@ -13,7 +13,6 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 class ConvE_args:
     def __init__(
         self,
-        embedding_dim=200,
         input_drop=0.05,
         hidden_drop=0.05,
         feat_drop=0.05,
@@ -21,7 +20,6 @@ class ConvE_args:
         embedding_shape1=20,
         hidden_size=9728,
     ):
-        self.embedding_dim = embedding_dim
         self.input_drop = input_drop
         self.hidden_drop = hidden_drop
         self.feat_drop = feat_drop
@@ -31,25 +29,25 @@ class ConvE_args:
 
 
 class ConvE(torch.nn.Module):
-    def __init__(self, args, num_entities, num_relations):
+    def __init__(self, args, embedding_dim, num_entities, num_relations):
         super(ConvE, self).__init__()
-        self.emb_e = torch.nn.Embedding(num_entities, args.embedding_dim, padding_idx=0)
+        self.emb_e = torch.nn.Embedding(num_entities, embedding_dim, padding_idx=0)
         self.emb_rel = torch.nn.Embedding(
-            num_relations, args.embedding_dim, padding_idx=0
+            num_relations, embedding_dim, padding_idx=0
         )
         self.inp_drop = torch.nn.Dropout(args.input_drop)
         self.hidden_drop = torch.nn.Dropout(args.hidden_drop)
         self.feature_map_drop = torch.nn.Dropout2d(args.feat_drop)
         self.loss = torch.nn.CrossEntropyLoss()
         self.emb_dim1 = args.embedding_shape1
-        self.emb_dim2 = args.embedding_dim // self.emb_dim1
+        self.emb_dim2 = embedding_dim // self.emb_dim1
 
         self.conv1 = torch.nn.Conv2d(1, 32, (3, 3), 1, 0, bias=args.use_bias)
         self.bn0 = torch.nn.BatchNorm2d(1)
         self.bn1 = torch.nn.BatchNorm2d(32)
-        self.bn2 = torch.nn.BatchNorm1d(args.embedding_dim)
+        self.bn2 = torch.nn.BatchNorm1d(embedding_dim)
         self.register_parameter("b", Parameter(torch.zeros(num_entities)))
-        self.fc = torch.nn.Linear(args.hidden_size, args.embedding_dim)
+        self.fc = torch.nn.Linear(args.hidden_size, embedding_dim)
         print(num_entities, num_relations)
 
     def init(self):
