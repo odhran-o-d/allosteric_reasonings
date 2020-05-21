@@ -15,5 +15,9 @@ def get_files():
         ASD_dictionary = pickle.load(handle)
     with open(join(data_directory,'Sparse_dictionary.pickle'), 'rb') as handle:
         BCE_dictionary = pickle.load(handle)
+    with open(join(data_directory,'edge_list.pickle'), 'rb') as handle:
+        Edge_list = pickle.load(handle)
+    with open(join(data_directory,'edge_features.pickle'), 'rb') as handle:
+        Edge_features = pickle.load(handle)
 
-    return data, lookup, ASD_dictionary, BCE_dictionary
+    return data, lookup, ASD_dictionary, BCE_dictionary, Edge_list, Edge_features
