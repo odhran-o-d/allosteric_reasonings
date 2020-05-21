@@ -76,6 +76,8 @@ if __name__ == "__main__":
     x = shuffle(data)
     test_data = x[:50]
 
+    # split data here into train, eval, test? Make sure eval fits into memory for AUROC?
+
     if args.model == "DistMult":
         model = DistMult(
             args=ConvE_args,
