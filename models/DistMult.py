@@ -9,7 +9,12 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 class DistMult(torch.nn.Module):
     def __init__(
-        self, args, embedding_dim=100, dropout=0.05, num_entities=2, num_relations=3
+        self,
+        args=None,
+        embedding_dim=100,
+        dropout=0.05,
+        num_entities=2,
+        num_relations=3,
     ):
         super(DistMult, self).__init__()
         self.emb_e = torch.nn.Embedding(num_entities, embedding_dim, padding_idx=0)
@@ -54,3 +59,8 @@ class DistMult(torch.nn.Module):
 # if you're using cross entropy, sigmoid in the dist mult is unecessary
 
 # BCE lets you formulate a loss based on 0-1 embeddings
+
+if __name__ == "__main__":
+    model = DistMult()
+    for param in model.parameters():
+        print(type(param.data), param.size())
