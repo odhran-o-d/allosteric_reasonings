@@ -13,6 +13,8 @@ import argparse
 
 
 def main(model, optimiser, test_data, epochs, batches):
+    mean_reciporical_rank = 0
+    break_condition = False
     for epoch in range(epochs):
         # training stage
         model.train()
@@ -31,22 +33,47 @@ def main(model, optimiser, test_data, epochs, batches):
             optimiser.step()
 
         # evaluation stage
-        model.eval()
-        objects, subjects, relationships = load_data(test_data, batches)
-        total_sum_reciporical_rank = torch.zeros(1)
 
-        for index in range(batches):
+        if epoch % 10 == 0:
 
-            obj = torch.LongTensor(objects[index])
-            rel = torch.LongTensor(relationships[index])
-            targets = torch.LongTensor(subjects[index])
+            model.eval()
+            objects, subjects, relationships = load_data(test_data, batches)
+            total_sum_reciporical_rank = torch.zeros(1)
 
-            predictions = model.forward(e1=obj, rel=rel)
-            srr = SRR(predictions, targets)
-            total_sum_reciporical_rank = total_sum_reciporical_rank + srr
+            for index in range(batches):
 
-        print("mean reciporical rank is...")
-        print(total_sum_reciporical_rank / len(test_data))
+                obj = torch.LongTensor(objects[index])
+                rel = torch.LongTensor(relationships[index])
+                targets = torch.LongTensor(subjects[index])
+
+                predictions = model.forward(e1=obj, rel=rel)
+                srr = SRR(predictions, targets)
+                total_sum_reciporical_rank = total_sum_reciporical_rank + srr
+
+            print("mean reciporical rank is...")
+            print(total_sum_reciporical_rank / len(test_data))
+            MRR = total_sum_reciporical_rank / len(test_data)
+            if MRR < (mean_reciporical_rank * 1.05):
+                torch.save(
+                    model,
+                    "Model_{model}_Epoch_{epoch}_MRR_{MRR}.pickle".format(
+                        model=args.model, epoch=epoch, MRR=MRR
+                    ),
+                )
+                break_condition = True
+            else:
+                mean_reciporical_rank = MRR
+
+        if epoch % 399 == 0:
+            torch.save(
+                model,
+                "Model_{model}_Epoch_Final_MRR_{MRR}.pickle".format(
+                    model=args.model, MRR=MRR
+                ),
+            )
+
+        if break_condition == True:
+            break
 
 
 if __name__ == "__main__":
@@ -57,7 +84,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--embdim",
-        default=200,
+        default=100,
+        choices=[100, 256, 625, 1024, 1600, 2025],
         type=int,
         help="this is the dimensionality of the embeddings",
     )
@@ -70,7 +98,7 @@ if __name__ == "__main__":
 
     ConvE_args = ConvE_args()
 
-    data, lookup, ASD_dictionary, BCE_dictionary = get_files()
+    data, lookup, ASD_dictionary, BCE_dictionary, _, __ = get_files()
     entities = int(len(lookup) / 2)
 
     x = shuffle(data)
