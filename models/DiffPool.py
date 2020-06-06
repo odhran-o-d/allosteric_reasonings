@@ -60,8 +60,8 @@ class GNN(torch.nn.Module):
 
 
 class Diff_Pool_Encoder(torch.nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
+    def __init__(self, max_nodes=150):
+        super(Diff_Pool_Encoder, self).__init__()
 
         num_nodes = ceil(0.25 * max_nodes)
         self.gnn1_pool = GNN(3, 64, num_nodes, add_loop=True)

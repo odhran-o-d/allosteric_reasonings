@@ -19,5 +19,9 @@ def get_files():
         Edge_list = pickle.load(handle)
     with open(join(data_directory,'edge_features.pickle'), 'rb') as handle:
         Edge_features = pickle.load(handle)
+    with open(join(data_directory,'drug_graph_list.pickle'), 'rb') as handle:
+        Drug_graph_list = pickle.load(handle)
+    with open(join(data_directory,'protein_graph_list.pickle'), 'rb') as handle:
+        Protein_graph_list = pickle.load(handle)
 
-    return data, lookup, ASD_dictionary, BCE_dictionary, Edge_list, Edge_features
+    return data, lookup, ASD_dictionary, BCE_dictionary, Edge_list, Edge_features, Drug_graph_list, Protein_graph_list
