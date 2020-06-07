@@ -106,9 +106,9 @@ class DistMult_Decoder(torch.nn.Module):
         protein_embedded = self.inp_drop(protein_embedded)
         rel_embedded = self.inp_drop(rel_embedded)
 
-        print(drug_embedded.shape)
-        print(protein_embedded.shape)
-        print(rel_embedded.shape)
+        # print(drug_embedded.shape)
+        # print(protein_embedded.shape)
+        # print(rel_embedded.shape)
         pred = torch.mm(drug_embedded * rel_embedded, protein_embedded.transpose(1, 0))
 
         return pred
@@ -145,5 +145,5 @@ class Encoder_Decoder(torch.nn.Module):
 
         prediction = self.decoder(protein_embedded, drug_embedded, rel_embedded)
 
-        print(prediction)
+        # print(prediction)
         return prediction
