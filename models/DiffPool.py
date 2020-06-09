@@ -60,20 +60,20 @@ class GNN(torch.nn.Module):
 
 
 class Diff_Pool_Encoder(torch.nn.Module):
-    def __init__(self, max_nodes=150):
+    def __init__(self, max_nodes=150, input_channels=3, dim=64):
         super(Diff_Pool_Encoder, self).__init__()
 
         num_nodes = ceil(0.25 * max_nodes)
-        self.gnn1_pool = GNN(3, 64, num_nodes, add_loop=True)
-        self.gnn1_embed = GNN(3, 64, 64, add_loop=True, lin=False)
+        self.gnn1_pool = GNN(input_channels, dim, num_nodes, add_loop=True)
+        self.gnn1_embed = GNN(input_channels, dim, dim, add_loop=True, lin=False)
 
         num_nodes = ceil(0.25 * num_nodes)
-        self.gnn2_pool = GNN(3 * 64, 64, num_nodes)
+        self.gnn2_pool = GNN(3 * dim, dim, num_nodes)
         self.gnn2_embed = GNN(
-            3 * 64, 64, 64, lin=False
+            3 * dim, dim, dim, lin=False
         )  # self.lin1 = torch.nn.Linear(3 * 64, 64)
         self.gnn3_embed = GNN(
-            3 * 64, 64, 64, lin=False
+            3 * dim, dim, dim, lin=False
         )  # self.lin2 = torch.nn.Linear(64, 6)
 
     def forward(self, x, adj, mask=None):
@@ -121,6 +121,7 @@ class Encoder_Decoder(torch.nn.Module):
         drug_encoder=Diff_Pool_Encoder(),
         decoder=DistMult_Decoder(),
         num_relationships=2,
+        relationship_size=3,
     ):
         super(Encoder_Decoder, self).__init__()
 
@@ -129,7 +130,7 @@ class Encoder_Decoder(torch.nn.Module):
         self.decoder = decoder  # this is the thing to build
 
         self.emb_rel = torch.nn.Embedding(
-            num_relationships, embedding_dim=64 * 3, padding_idx=0
+            num_relationships, embedding_dim=64 * relationship_size, padding_idx=0
         )
 
     def init(self):
@@ -140,8 +141,8 @@ class Encoder_Decoder(torch.nn.Module):
         rel_embedded = self.emb_rel(rel)
         rel_embedded = rel_embedded.squeeze()
 
-        drug_embedded = self.drug_encoder(d_graph, d_adj, d_mask)
-        protein_embedded = self.protein_encoder(d_graph, d_adj, d_mask)
+        drug_embedded = self.drug_encoder(x=d_graph, adj=d_adj, mask=d_mask)
+        protein_embedded = self.protein_encoder(x=d_graph, adj=d_adj, mask=d_mask)
 
         prediction = self.decoder(protein_embedded, drug_embedded, rel_embedded)
 
