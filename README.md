@@ -1,7 +1,9 @@
 Allosteric_reasonings
 ==============================
 
-This is a project to perform reasoning using distmult on the ASD dataset
+This is a project to perform reasoning on the Allosteric Database Dataset. This project proposes 'ChainPool' an end-to-end framework to allow for propagation of information about protein and drug structure to an bipartite portein-drug interaction graph. 
+
+
 
 Project Organization
 ------------
